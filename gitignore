@@ -1,0 +1,30 @@
+stack.yaml
+
+# Editors
+.vscode/
+
+__pycache__/
+*.py[cod]
+*$py.class
+lib/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Flask stuff:
+instance/
+
+# Environments
+.env
+env/
+env.bak/
