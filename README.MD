@@ -1,4 +1,4 @@
-# 1. Para levantar el servicio en local siga estos pasos:
+# 1. Levantar el servicio en local:
 
 ## Crear virtual enviroment  
 python3 -m venv env  
