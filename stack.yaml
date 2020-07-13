@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   back:
-    image: back-main
+    image: back
     hostname: back
     ports:
       - 5000:5000
