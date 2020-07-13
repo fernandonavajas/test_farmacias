@@ -10,8 +10,7 @@ source env/bin/activate
 pip install -r requirements.txt  
 
 ### Iniciar proyecto
-cd project/api
-python farmacias.py
+python app.py
 
 ## 2. Probar servicio
 http://127.0.0.1:5000/
