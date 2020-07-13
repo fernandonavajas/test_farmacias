@@ -23,9 +23,26 @@ class TestFarmacias(unittest.TestCase):
     def test_buscador_succesfull(self):
         app = Flask(__name__)
         configure_routes(app)
-
-        url_obtain_comunas = 'https://farmanet.minsal.cl/maps/index.php/ws/getLocalesRegion?id_region=7'
-        responses.add(responses.POST, url_obtain_comunas, status=200)
+        body = '''[
+            {
+            "fecha": "13-07-2020",
+            "local_id": "534",
+            "local_nombre": "TORRES MPD",
+            "comuna_nombre": "RECOLETA",
+            "localidad_nombre": "RECOLETA",
+            "local_direccion": "AVENIDA EL SALTO 2972",
+            "funcionamiento_hora_apertura": "10:30 hrs.",
+            "funcionamiento_hora_cierre": "19:30 hrs.",
+            "local_telefono": "+560225053570",
+            "local_lat": "-33.3996351",
+            "local_lng": "-70.62894990000001",
+            "funcionamiento_dia": "lunes",
+            "fk_region": "7",
+            "fk_comuna": "122"
+            }
+        ]'''
+        url_obtain_comunas = 'https://farmanet.minsal.cl/maps/index.php/ws/getLocalesRegion'
+        responses.add(responses.GET,url_obtain_comunas,body=body, status=200)
         client = app.test_client()
         url = '/buscador'
         mock_request_form_data = {
@@ -35,29 +52,21 @@ class TestFarmacias(unittest.TestCase):
 
         response = client.get(url,data= mock_request_form_data)
         assert 200 == response.status_code
-
-
-    def test_ordenarResponse_succesfull(self):
-        data = [
-            {
-                "fecha": "12-07-2020",
-                "local_id": "910",
-                "local_nombre": "MAESTRE",
-                "comuna_nombre": "INDEPENDENCIA",
-                "localidad_nombre": "INDEPENDENCIA",
-                "local_direccion": "AV. SALOMON SACK 928",
-                "funcionamiento_hora_apertura": "08:30 hrs.",
-                "funcionamiento_hora_cierre": "21:30 hrs.",
-                "local_telefono": "+560227376512",
-                "local_lat": "-33.414275",
-                "local_lng": "-70.678147",
-                "funcionamiento_dia": "domingo",
-                "fk_region": "7",
-                "fk_comuna": "94"
-            }
-        ]
-        self.assertIs(type(configure_routes.ordenarResponse(data)),str)
     
-    def test_ordenarResponse_without_values(self):
-        data = [{}]
-        self.assertIs(type(configure_routes.ordenarResponse(data)),str)
+    @responses.activate
+    def test_buscador_error_obtain_locales(self):
+        app = Flask(__name__)
+        configure_routes(app)
+
+        url_obtain_comunas = 'https://farmanet.minsal.cl/maps/index.php/ws/getLocalesRegion'
+        responses.add(responses.GET, url_obtain_comunas, status=500)
+        client = app.test_client()
+        url = '/buscador'
+        mock_request_form_data = {
+            'comuna': '122',
+            'nombre_local':'AHUMADA'
+        }
+
+        response = client.get(url,data= mock_request_form_data)
+        assert 500 == response.status_code
+

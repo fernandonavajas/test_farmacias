@@ -12,8 +12,9 @@ def configure_routes(app):
         }
         response_invoice = requests.post(url_obtain_comunas,request_obtain_comunas)
         if response_invoice.status_code not in [200]:
-            return {"Status":"Error del servicio midastest.minsal.cl/farmacias",
-                    "Codigo": response_invoice.status_code }
+            return {"status":"Error",
+                    "message": "Error del servicio midastest.minsal.cl/farmacias",
+                    "codigo": response_invoice.status_code }, 500
         response_invoice.text
 
         return template_home(response_invoice.text)
@@ -30,10 +31,13 @@ def configure_routes(app):
         url_list_farmacias = 'https://farmanet.minsal.cl/maps/index.php/ws/getLocalesRegion?id_region='+str(region)
         response_farmacias = requests.get(url_list_farmacias)
         if response_farmacias.status_code not in [200]:
-            return {"Status":"Error del servicio farmanet.minsal.cl/getLocalesRegion",
-                    "Codigo": response_invoice.status_code }
+            return {"status":"Error del servicio farmanet.minsal.cl/getLocalesRegion",
+                    "codigo": response_invoice.status_code }
 
         #3. Filtrar farmacias por comuna y/o nombre
+        if not response_farmacias.text:
+            return {"status":"Error",
+                    "message": "El servicio midastest.minsal.cl/farmacias respondio vacio" }, 500 
         input_dict = json.loads(response_farmacias.text)
 
         # Filtro por comuna

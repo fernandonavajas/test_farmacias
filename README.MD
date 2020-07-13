@@ -1,7 +1,7 @@
 ## 1. Levantar el servicio en local
 
 ### Crear virtual enviroment  
-python -m venv env  
+python3 -m venv env  
 
 ### Activar enviroment 
 source env/bin/activate
@@ -23,4 +23,7 @@ http://127.0.0.1:5000/buscador?comuna=83&nombre_local=cruz%20verde
 python -m pytest
 
 ### Ejecutar test coverage
-python -m pytest --cov="project"
+coverage run .\app.py
+
+### Esto genera un reporte que se podra ver con:
+coverage report
