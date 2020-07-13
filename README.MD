@@ -1,7 +1,7 @@
 ## 1. Levantar el servicio en local
 
 ### Crear virtual enviroment  
-python3 -m venv env  
+python -m venv env  
 
 ### Activar enviroment 
 source env/bin/activate
