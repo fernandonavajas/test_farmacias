@@ -15,7 +15,6 @@ def configure_routes(app):
             return {"status":"Error",
                     "message": "Error del servicio midastest.minsal.cl/farmacias",
                     "codigo": response_invoice.status_code }, 500
-        response_invoice.text
 
         return template_home(response_invoice.text)
 
@@ -37,7 +36,7 @@ def configure_routes(app):
         #3. Filtrar farmacias por comuna y/o nombre
         if not response_farmacias.text:
             return {"status":"Error",
-                    "message": "El servicio midastest.minsal.cl/farmacias respondio vacio" }, 500 
+                    "message": "El servicio midastest.minsal.cl/farmacias respondio vacio" }, 412 
         input_dict = json.loads(response_farmacias.text)
 
         # Filtro por comuna
@@ -49,19 +48,20 @@ def configure_routes(app):
             input_dict = [x for x in input_dict if x.get('local_nombre').strip() == nombre_local]
 
         # 4. Armar el response según lo solicitado
-        return ordenarResponse(input_dict)
+        return ordenarResponse(input_dict), 200, {"Content-Type":"application/json"}
 
 
     def ordenarResponse(input_dict):
         response=[]
+
         for x in input_dict:
-                specific_values_dict = {}
-                specific_values_dict['Nombre del local'] = x.get('local_nombre','') or ''
-                specific_values_dict['Dirección'] = x.get('local_direccion','') or ''
-                specific_values_dict['Teléfono'] = x.get('local_telefono','') or ''
-                specific_values_dict['Latitud'] = x.get('local_lat','') or ''
-                specific_values_dict['Longitud'] = x.get('local_lng','') or ''
-                response.append(specific_values_dict)
+            specific_values_dict = {}
+            specific_values_dict['Nombre del local'] = x.get('local_nombre','') or ''
+            specific_values_dict['Dirección'] = x.get('local_direccion','') or ''
+            specific_values_dict['Teléfono'] = x.get('local_telefono','') or ''
+            specific_values_dict['Latitud'] = x.get('local_lat','') or ''
+            specific_values_dict['Longitud'] = x.get('local_lng','') or ''
+            response.append(specific_values_dict)
 
         return json.dumps(response)
 
@@ -78,7 +78,7 @@ def configure_routes(app):
                 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
             </head>
 
-            <body>
+            <body style='background-color:aliceblue;text-align: center;'>
                 <h1 style='color: orange;'>Busca tus farmacias por sector</h1>
                 <div style='display: row'>
                     <label for="cars">Elije una comuna </label>

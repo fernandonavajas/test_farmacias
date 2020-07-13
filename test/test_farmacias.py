@@ -1,13 +1,16 @@
 from flask import Flask
-import unittest 
+import unittest , json
 from unittest import mock
 from  pytest_mock import mocker
 import responses
 
 from api.farmacias import configure_routes
 
+url_obtain_farmacias = 'https://farmanet.minsal.cl/maps/index.php/ws/getLocalesRegion'
+
 
 class TestFarmacias(unittest.TestCase):
+
 
     def test_base_route(self):
         app = Flask(__name__)
@@ -18,9 +21,9 @@ class TestFarmacias(unittest.TestCase):
         response = client.get(url)
         assert response.status_code == 200
 
-
+    
     @responses.activate
-    def test_buscador_succesfull(self):
+    def test_farmacia_succesfull(self):
         app = Flask(__name__)
         configure_routes(app)
         body = '''[
@@ -41,25 +44,48 @@ class TestFarmacias(unittest.TestCase):
             "fk_comuna": "122"
             }
         ]'''
-        url_obtain_comunas = 'https://farmanet.minsal.cl/maps/index.php/ws/getLocalesRegion'
-        responses.add(responses.GET,url_obtain_comunas,body=body, status=200)
+        
+        responses.add(responses.GET,url_obtain_farmacias,body=body, status=200)
         client = app.test_client()
         url = '/buscador'
         mock_request_form_data = {
             'comuna': '122',
-            'nombre_local':'AHUMADA'
+            'nombre_local':'TORRES MPD'
         }
 
         response = client.get(url,data= mock_request_form_data)
         assert 200 == response.status_code
-    
+
+
     @responses.activate
-    def test_buscador_error_obtain_locales(self):
+    def test_farmacia_no_encontrada(self):
         app = Flask(__name__)
         configure_routes(app)
 
-        url_obtain_comunas = 'https://farmanet.minsal.cl/maps/index.php/ws/getLocalesRegion'
-        responses.add(responses.GET, url_obtain_comunas, status=500)
+        body = '''[
+            {
+                "fecha": "12-07-2020"
+            }
+        ]'''
+
+        responses.add(responses.GET, url_obtain_farmacias,body=body, status=200)
+        client = app.test_client()
+        url = '/buscador'
+        mock_request_form_data = {
+            'comuna': '999',
+            'nombre_local':'Farmacia Fuentes'
+        }
+        response = client.get(url,data= mock_request_form_data)
+        
+        assert 200 == response.status_code
+
+
+    @responses.activate
+    def test_farmacia_error_obtener_locales(self):
+        app = Flask(__name__)
+        configure_routes(app)
+
+        responses.add(responses.GET, url_obtain_farmacias, status=500)
         client = app.test_client()
         url = '/buscador'
         mock_request_form_data = {
@@ -69,4 +95,6 @@ class TestFarmacias(unittest.TestCase):
 
         response = client.get(url,data= mock_request_form_data)
         assert 500 == response.status_code
+    
 
+        
